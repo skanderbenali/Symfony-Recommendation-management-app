@@ -1,0 +1,849 @@
+{% extends 'base.html.twig' %}
+
+{% block search %}
+    <li class="nav-item w-100">
+        <form id="searchForm" class="nav-link mt-2 mt-md-0 d-none d-lg-flex" method="GET" action="{{ path('getAll') }}">
+            <input type="text" id="searchInput" name="search" class="form-control" placeholder="Search recommendation..." value="{{ searchTerm|default('') }}">
+            <button type="submit" class="btn btn-primary ml-2">
+                <i class="mdi mdi-magnify"></i>
+            </button>
+        </form>
+    </li>
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Handle modal opening
+            $('#addConseil_btn').on('click', function(e) {
+                e.preventDefault();
+                $('#myModal').modal('show');
+            });
+
+            // Handle form submission - Make sure Submit button works
+            $('#conseilForm').on('submit', function(e) {
+                // Show loading state
+                $(this).find('button[type="submit"]').prop('disabled', true).html('<i class="mdi mdi-loading mdi-spin mr-2"></i>Saving...');
+            });
+
+            // Auto-hide flash messages after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+            
+            // Client-side table search for immediate filtering of current results
+            $('#tableSearch').on('keyup', function(e) {
+                // Only filter client-side if the user hasn't pressed Enter
+                if (e.key !== 'Enter') {
+                    var value = $(this).val().toLowerCase();
+                    $("#conseilTableBody tr").filter(function() {
+                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                    });
+                }
+            });
+            
+            // Custom file input label update
+            $('.custom-file-input').on('change', function() {
+                var fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').html(fileName || 'Choose file');
+            });
+            
+            // Initialize tooltips
+            $('[data-toggle="tooltip"]').tooltip();
+            
+            // Video Modal Functionality
+            // Get the modal and video elements
+            var videoModal = document.getElementById("videoModal");
+            var modalVideo = document.getElementById("modalVideo");
+            var videoClose = document.getElementsByClassName("video-close")[0];
+            
+            // Open the video modal when clicking on a thumbnail
+            $('.video-thumbnail').on('click', function() {
+                var videoSrc = $(this).data('video');
+                $('#modalVideo source').attr('src', videoSrc);
+                modalVideo.load();
+                videoModal.style.display = "block";
+                modalVideo.play();
+                
+                // Add the body-scrolling class to prevent background scrolling
+                $('body').addClass('modal-open');
+            });
+            
+            // Close the modal when clicking the close button
+            $(videoClose).on('click', function() {
+                closeVideoModal();
+            });
+            
+            // Close the modal when clicking outside the video
+            $(window).on('click', function(event) {
+                if (event.target == videoModal) {
+                    closeVideoModal();
+                }
+            });
+            
+            // Close modal function
+            function closeVideoModal() {
+                modalVideo.pause();
+                videoModal.style.display = "none";
+                
+                // Remove the body-scrolling class
+                $('body').removeClass('modal-open');
+            }
+            
+            // Prevent video click from bubbling to the document
+            $('.video-modal-content').on('click', function(e) {
+                e.stopPropagation();
+            });
+        });
+
+        // Initialize charts when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pie chart for recommendation categories
+            var ctx = document.getElementById('conseilPieChart').getContext('2d');
+            var conseilCountsByType = {{ conseilCountsByType | json_encode | raw }};
+
+            var labels = conseilCountsByType.map(item => item.typeConseil);
+            var data = conseilCountsByType.map(item => item.count);
+
+            var pieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Recommendations by Type',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(255, 159, 64, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#192F5D',
+                                font: {
+                                    size: 12
+                                },
+                                padding: 15
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribution of Recommendations by Category',
+                            color: '#192F5D',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 20
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Bar chart for average ratings
+            var ctxBar = document.getElementById('averageRatingByConseilChart').getContext('2d');
+            var chart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: {{ labels|json_encode|raw }},
+                    datasets: [{
+                        label: 'Average Rating',
+                        data: {{ data|json_encode|raw }},
+                        backgroundColor: 'rgba(25, 47, 93, 0.7)',
+                        borderColor: 'rgba(25, 47, 93, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(200, 200, 200, 0.1)'
+                            },
+                            ticks: {
+                                stepSize: 1,
+                                precision: 1,
+                                color: '#6c757d'
+                            },
+                            max: 5,
+                            title: {
+                                display: true,
+                                text: 'Average Rating (out of 5)',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(200, 200, 200, 0.1)'
+                            },
+                            ticks: {
+                                color: '#6c757d',
+                                callback: function(value) {
+                                    const label = this.getLabelForValue(value);
+                                    return label.length > 15 ? label.substring(0, 15) + '...' : label;
+                                },
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#192F5D',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Average Rating by Recommendation',
+                            color: '#192F5D',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 20
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <h3 class="page-title">Recommendation Management</h3>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Recommendations</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex">
+            <a href="{{ path('conseil_new') }}" class="btn btn-sm btn-primary mr-2">
+                <i class="mdi mdi-plus-circle"></i> Create
+            </a>
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="mdi mdi-settings mr-1"></i> Actions
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="{{ path('getAllFront')}}">
+                        <i class="mdi mdi-monitor-dashboard mr-2"></i> Front Office
+                    </a>
+                    <a class="dropdown-item" href="{{ path('sort_by_category_asc') }}">
+                        <i class="mdi mdi-sort-alphabetical-ascending mr-2"></i> Sort by Category
+                    </a>
+                    <a class="dropdown-item" href="{{ path('export_to_excel') }}">
+                        <i class="mdi mdi-microsoft-excel mr-2"></i> Export to Excel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {# Flash Messages #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                {% if label == 'success' %}
+                    <i class="mdi mdi-check-circle mr-2"></i>
+                {% elseif label == 'error' or label == 'danger' %}
+                    <i class="mdi mdi-alert-circle mr-2"></i>
+                {% elseif label == 'warning' %}
+                    <i class="mdi mdi-alert mr-2"></i>
+                {% else %}
+                    <i class="mdi mdi-information mr-2"></i>
+                {% endif %}
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {# Stats Cards #}
+    <div class="row mb-4">
+        <div class="col-sm-4 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="font-weight-bold mb-0">{{ number }}</h4>
+                            <h6 class="font-weight-normal mb-0">Total Recommendations</h6>
+                        </div>
+                        <div class="icon-box bg-light-blue">
+                            <i class="mdi mdi-clipboard-list text-primary icon-item"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="progress">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-sm-4 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="font-weight-normal mb-0">Last Recommendation Added</h6>
+                            <h4 class="font-weight-bold mb-0">
+                                {% if latestConseilDate %}
+                                    {{ latestConseilDate|date('d/m/Y') }}
+                                {% else %}
+                                    No Recommendations
+                                {% endif %}
+                            </h4>
+                        </div>
+                        <div class="icon-box bg-light-green">
+                            <i class="mdi mdi-calendar-check text-success icon-item"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-sm-4 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="font-weight-bold mb-0">{{ revCount }}</h4>
+                            <h6 class="font-weight-normal mb-0">Total Reviews</h6>
+                        </div>
+                        <div class="icon-box bg-light-orange">
+                            <i class="mdi mdi-star text-warning icon-item"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="progress">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Charts Row #}
+    <div class="row mb-4">
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="card-title mb-0">Recommendations by Category</h4>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="chartOptions1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="mdi mdi-dots-vertical"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="chartOptions1">
+                                <a class="dropdown-item" href="#">Export as PNG</a>
+                                <a class="dropdown-item" href="#">Export as PDF</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="conseilPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="card-title mb-0">Average Rating by Recommendation</h4>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="chartOptions2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="mdi mdi-dots-vertical"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="chartOptions2">
+                                <a class="dropdown-item" href="#">Export as PNG</a>
+                                <a class="dropdown-item" href="#">Export as PDF</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="averageRatingByConseilChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Recommendations Table #}
+    <div class="row">
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between py-3" style="background-color: #192F5D; color: white;">
+                    <h5 class="card-header-title mb-0 text-white">
+                        <i class="mdi mdi-filter-variant mr-2"></i> Advanced Filters
+                    </h5>
+                    <button class="btn btn-sm" style="background-color: #F78B23; color: white;" type="button" data-toggle="collapse" data-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+                        <i class="mdi mdi-chevron-down"></i> Show/Hide
+                    </button>
+                </div>
+                
+                <div class="collapse" id="filterCollapse">
+                    <div class="card-body">
+                        {{ form_start(filter_form) }}
+                            <div class="row">
+                                <div class="col-md-4">
+                                    {{ form_row(filter_form.nomConseil) }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ form_row(filter_form.idTypec) }}
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        {{ form_label(filter_form.datecreation) }}
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                {{ form_widget(filter_form.datecreation.left_date) }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {{ form_widget(filter_form.datecreation.right_date) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 text-right">
+                                    <a href="{{ path('getAll') }}" class="btn btn-outline-secondary">
+                                        <i class="mdi mdi-refresh mr-1"></i> Reset
+                                    </a>
+                                    {{ form_widget(filter_form.submit) }}
+                                </div>
+                            </div>
+                        {{ form_end(filter_form) }}
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="card-title mb-0">List of Recommendations</h4>
+                        <div class="d-flex align-items-center">
+                            <form method="GET" action="{{ path('getAll') }}" class="input-group mr-3" style="width: 300px;">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-primary text-white">
+                                        <i class="mdi mdi-magnify"></i>
+                                    </span>
+                                </div>
+                                <input type="text" class="form-control" id="tableSearch" name="search" placeholder="Search..." value="{{ searchTerm|default('') }}">
+                                <div class="input-group-append">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="mdi mdi-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <div>
+                                <a href="{{ path('conseil_new') }}" class="btn btn-sm btn-primary mr-2">
+                                    <i class="mdi mdi-plus-circle"></i> Create
+                                </a>
+                                <a href="{{ path('export_to_excel') }}" class="btn btn-sm btn-success mr-2">
+                                    <i class="mdi mdi-file-excel"></i> Excel
+                                </a>
+                                <a href="{{ path('export_to_csv') }}" class="btn btn-sm btn-info mr-2">
+                                    <i class="mdi mdi-file-delimited"></i> CSV
+                                </a>
+                                <a href="{{ path('sort_by_category_asc') }}" class="btn btn-sm btn-dark">
+                                    <i class="mdi mdi-sort"></i> Sort
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 5%;">#</th>
+                                    <th style="width: 15%;">Recommendation Name</th>
+                                    <th style="width: 15%;">Video</th>
+                                    <th style="width: 20%;">Description</th>
+                                    <th style="width: 10%;">Date</th>
+                                    <th style="width: 10%;">Category</th>
+                                    <th style="width: 10%;">Product</th>
+                                    <th class="text-center" style="width: 15%;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="conseilTableBody">
+                                {% for element in c %}
+                                <tr>
+                                    <td class="text-center text-success font-weight-bold">{{ element.idConseil }}</td>
+                                    <td class="font-weight-medium">{{ element.nomConseil }}</td>
+                                    <td>
+                                        {% if element.video %}
+                                            <div class="video-thumbnail" data-video="{{ asset('uploads/conseil/' ~ element.video) }}">
+                                                <video width="120" height="80" class="rounded">
+                                                    <source src="{{ asset('uploads/conseil/' ~ element.video) }}" type="video/mp4">
+                                                </video>
+                                                <div class="play-overlay">
+                                                    <i class="mdi mdi-play-circle"></i>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <p class="text-muted">No video available</p>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="text-description">
+                                            {{ element.description|length > 50 ? element.description|slice(0, 50) ~ '...' : element.description }}
+                                        </div>
+                                    </td>
+                                    <td>{{ element.datecreation|date('d/m/Y') }}</td>
+                                    <td><span class="badge badge-info p-2">{{ element.idTypec.nomtypec }}</span></td>
+                                    <td><span class="badge badge-primary p-2">{{ element.idProduit.nomProduit }}</span></td>
+                                    <td class="text-center">
+                                        <a href="{{ path('conseil_update', {'idc': element.idConseil}) }}" class="btn btn-outline-primary btn-sm mr-1" data-toggle="tooltip" title="Edit">
+                                            <i class="mdi mdi-pencil"></i>
+                                        </a>
+                                        <a href="{{ path('conseil_delete', {'id': element.idConseil}) }}" class="btn btn-outline-danger btn-sm mr-1" data-toggle="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this recommendation?');">
+                                            <i class="mdi mdi-delete"></i>
+                                        </a>
+                                        <a href="{{ path('getOne', {'idc': element.idConseil}) }}" class="btn btn-outline-info btn-sm" data-toggle="tooltip" title="Details">
+                                            <i class="mdi mdi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="pagination-container mt-4">
+                            {{ knp_pagination_render(c) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Video Modal #}
+    <div id="videoModal" class="video-modal">
+        <div class="video-modal-content">
+            <div class="video-close">&times;</div>
+            <div class="video-container">
+                <video id="modalVideo" width="100%" controls>
+                    <source src="" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    {# Modal for adding recommendation #}
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #192F5D; color: white;">
+                    <h5 class="modal-title" id="myModalLabel">Create New Recommendation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" style="color: white;">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="conseilForm" action="{{ path('conseil_add') }}" method="POST" enctype="multipart/form-data">
+                        {{ form_widget(fc) }}
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Custom styling */
+        .icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .bg-light-blue {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+        
+        .bg-light-green {
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+        
+        .bg-light-orange {
+            background-color: rgba(255, 193, 7, 0.1);
+        }
+        
+        .icon-item {
+            font-size: 24px;
+        }
+        
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        
+        .badge {
+            font-weight: 500;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.03);
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            color: #333;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            margin: 0 4px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a.active {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+
+        .pagination a:hover:not(.active) {
+            background-color: #f1f1f1;
+        }
+        
+        .video-thumbnail {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .video-thumbnail video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: all 0.2s ease;
+        }
+        
+        .play-overlay i {
+            background-color: rgba(25, 47, 93, 0.7);
+            border-radius: 50%;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .video-thumbnail:hover .play-overlay {
+            opacity: 1;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        
+        .video-thumbnail:hover .play-overlay i {
+            transform: scale(1.2);
+            background-color: rgba(247, 139, 35, 0.8);
+        }
+        
+        /* Prevent body scrolling when modal is open */
+        body.modal-open {
+            overflow: hidden;
+        }
+        
+        .text-description {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* WebKit scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Bootstrap Select2 customization */
+        .select2-container--default .select2-selection--single {
+            height: 38px;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 38px;
+        }
+        
+        /* Custom file input */
+        .custom-file-label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Tooltip customization */
+        .tooltip {
+            z-index: 1070;
+            font-size: 0.75rem;
+        }
+        
+        /* Video modal overlay */
+        .video-modal {
+            display: none;
+            position: fixed;
+            z-index: 1060;
+            padding-top: 50px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.85);
+            transition: all 0.3s ease;
+        }
+        
+        .video-modal-content {
+            position: relative;
+            background-color: #192F5D;
+            margin: auto;
+            padding: 0;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .video-container {
+            padding: 20px;
+        }
+        
+        .video-close {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            color: white;
+            background-color: #F78B23;
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1070;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .video-close:hover {
+            background-color: #e67a12;
+            transform: scale(1.1);
+        }
+        
+        .video-thumbnail {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .video-thumbnail:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+{% endblock %}

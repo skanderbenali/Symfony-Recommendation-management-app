@@ -1,0 +1,256 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add New Recommendation{% endblock %}
+
+{% block body %}
+<div class="container-fluid page-body-wrapper">
+    <div class="main-panel">
+        <div class="content-wrapper">
+            <div class="page-header">
+                <h3 class="page-title">
+                    <span class="page-title-icon bg-gradient-primary text-white me-2">
+                        <i class="mdi mdi-library-plus"></i>
+                    </span> 
+                    Add New Recommendation
+                </h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ path('getAll') }}">Recommendations</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Add New</li>
+                    </ol>
+                </nav>
+            </div>
+            
+            <div class="row">
+                <div class="col-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Recommendation Details</h4>
+                            <p class="card-description">
+                                Fill in the information below to create a new recommendation. <span class="text-danger">*</span> indicates required fields.
+                            </p>
+                            
+                            {% for message in app.flashes('success') %}
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <i class="mdi mdi-check-circle-outline me-2"></i>
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% endfor %}
+                            
+                            {% for message in app.flashes('error') %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="mdi mdi-alert-circle-outline me-2"></i>
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% endfor %}
+                            
+                            {{ form_start(fc, {'attr': {'class': 'forms-sample', 'enctype': 'multipart/form-data'}}) }}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form_label(fc.nomConseil, 'Recommendation Name', {'label_attr': {'class': 'form-label'}}) }}
+                                        <span class="text-danger">*</span>
+                                        {{ form_widget(fc.nomConseil, {'attr': {'class': 'form-control', 'placeholder': 'Enter recommendation name'}}) }}
+                                        <div class="text-danger">
+                                            {{ form_errors(fc.nomConseil) }}
+                                        </div>
+                                        <small class="form-text text-muted">Must start with an uppercase letter.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form_label(fc.video, 'Video File', {'label_attr': {'class': 'form-label'}}) }}
+                                        <div class="custom-file">
+                                            {{ form_widget(fc.video, {'attr': {'class': 'custom-file-input', 'id': 'customFile'}}) }}
+                                            <label class="custom-file-label" for="customFile">Choose video file</label>
+                                        </div>
+                                        <div class="text-danger">
+                                            {{ form_errors(fc.video) }}
+                                        </div>
+                                        <small class="form-text text-muted">Upload MP4 video file, max size 5MB.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        {{ form_label(fc.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                                        <span class="text-danger">*</span>
+                                        {{ form_widget(fc.description, {'attr': {'class': 'form-control', 'rows': 4, 'placeholder': 'Provide a detailed description of this recommendation'}}) }}
+                                        <div class="text-danger">
+                                            {{ form_errors(fc.description) }}
+                                        </div>
+                                        <small class="form-text text-muted">Minimum 20 characters required.</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form_label(fc.idTypec, 'Category', {'label_attr': {'class': 'form-label'}}) }}
+                                        <span class="text-danger">*</span>
+                                        {{ form_widget(fc.idTypec, {'attr': {'class': 'form-control select2'}}) }}
+                                        <div class="text-danger">
+                                            {{ form_errors(fc.idTypec) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form_label(fc.idProduit, 'Associated Product', {'label_attr': {'class': 'form-label'}}) }}
+                                        <span class="text-danger">*</span>
+                                        {{ form_widget(fc.idProduit, {'attr': {'class': 'form-control select2'}}) }}
+                                        <div class="text-danger">
+                                            {{ form_errors(fc.idProduit) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <div class="col-12 text-right">
+                                    <a href="{{ path('getAll') }}" class="btn btn-light">
+                                        <i class="mdi mdi-arrow-left me-1"></i>
+                                        Cancel
+                                    </a>
+                                    {{ form_widget(fc.Enregistrer, {'attr': {'class': 'btn btn-gradient-primary ml-2'}, 'label': 'Save'}) }}
+                                </div>
+                            </div>
+                            {{ form_end(fc) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .form-label {
+            font-weight: 500;
+            color: #343a40;
+        }
+        
+        .select2-container--default .select2-selection--single {
+            height: 38px;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+        }
+        
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 38px;
+        }
+        
+        .btn-gradient-primary {
+            background: linear-gradient(to right, #192F5D, #2A4DAB);
+            border: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-gradient-primary:hover {
+            background: linear-gradient(to right, #2A4DAB, #192F5D);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-title-icon {
+            background: linear-gradient(to right, #192F5D, #2A4DAB);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+        }
+        
+        .card {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            border: none;
+        }
+        
+        .card-title {
+            color: #192F5D;
+            font-weight: 600;
+        }
+        
+        .card-description {
+            margin-bottom: 25px;
+            color: #6c757d;
+        }
+        
+        .breadcrumb {
+            background-color: transparent;
+            padding: 0;
+        }
+        
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: "›";
+            color: #6c757d;
+            font-size: 18px;
+            line-height: 1;
+            vertical-align: middle;
+        }
+        
+        .breadcrumb-item a {
+            color: #F78B23;
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item a:hover {
+            color: #e67a12;
+            text-decoration: underline;
+        }
+        
+        .breadcrumb-item.active {
+            color: #6c757d;
+        }
+        
+        .text-danger {
+            color: #dc3545;
+        }
+        
+        .custom-file-label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .form-text.text-muted {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2
+            $('.select2').select2({
+                width: '100%',
+                theme: 'bootstrap4'
+            });
+            
+            // Custom file input label update
+            $('.custom-file-input').on('change', function() {
+                var fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').html(fileName || 'Choose file');
+            });
+            
+            // Auto-hide flash messages after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+{% endblock %}

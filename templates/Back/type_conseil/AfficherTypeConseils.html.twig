@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+  <div class="page-header">
+      <h3 class="page-title">Gestion des Conseils</h3>
+<a class="nav-link btn btn-success create-new-button" id="addtypeConseil_btn" aria-expanded="false" href="#">+ Créer Type Conseil</a>
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content" style="background-color: #191c24;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="myModalLabel">Créer Nouveau Type Conseil</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #f01111;">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <form id="Form" action="#" method="post" enctype="multipart/form-data">
+          {{ form_widget(f) }} 
+          <input type="hidden" name="_token" value="{{ csrf_token('add') }}"> 
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="#">Conseils</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">Liste des Conseils</li>
+                </ol>
+              </nav>
+            </div>
+            <div class="row">
+              <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="card-title">Liste des TypeC</h4>
+                    <div class="table-responsive" style="height: 400px; overflow-y: auto; overflow-x: hidden;">
+                <table class="table table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Type Conseil</th>
+            <th>Modifier</th>
+            <th>Supprimer</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for element in c %}
+        <tr>
+            <td class="text-success">{{ element.idtypec }}</td>
+            <td>{{ element.nomtypec }}</td>
+            <td>
+                <a href="{{ path('Typeconseil_update', {'id': element.idtypec}) }}" class="btn btn-outline-warning btn-icon-text">Modifier <i class="mdi mdi-file-check btn-icon-append"></i></a>
+            </td>
+            <td>
+                <a href="{{ path('typeconseil_delete', {'id': element.idtypec}) }}" class="btn btn-outline-danger btn-icon-text">Supprimer <i class="mdi mdi-file-remove btn-icon-append"></i></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+      </div>
+
+      <!-- Modal -->
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Bootstrap CSS -->
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+{% block JS %}
+<script>
+
+  document.addEventListener("DOMContentLoaded", function() {
+    // Handling 'Créer Conseil' button click event
+    document.getElementById("addtypeConseil_btn").addEventListener("click", function() {
+        $('#myModal').modal('show');
+        // Set the form action to 'conseil_add' when 'Créer Conseil' button is clicked
+        test = document.getElementById("Form").action = "{{ path('typeconseil_add') }}";
+        console.log("Form Action:", test);
+    });
+});
+
+</script>
+{% endblock %}
+
+
+
+    <style>
+    /* WebKit (Chrome, Safari, etc.) */
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background-color: #191c24;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 10px;
+        border: 2px solid #191c24;
+    }
+
+    #conseilAddedModal {
+    position: fixed;
+    top: 0px; /* Adjust as needed */
+    right: 0px; /* Adjust as needed */
+    z-index: 1050; /* Ensure modal is on top of other elements */
+}
+
+    /* Firefox */
+    scrollbar-color: #888 #191c24;
+</style>
+
+
+
+
+    {% endblock %}

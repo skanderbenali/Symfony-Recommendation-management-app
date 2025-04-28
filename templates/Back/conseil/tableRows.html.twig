@@ -1,0 +1,25 @@
+{% extends 'AfficherConseils.html.twig' %}
+
+{% block rows %}
+{% for element in c %}
+    <tr>
+        <td class="text-success">{{ element.idConseil }}</td>
+        <td>{{ element.nomConseil }}</td>
+        <td>
+            <video width="200" height="150" controls>
+                <source src="/uploads/conseil/{{ element.video }}" type="video/mp4">
+            </video>
+        </td>
+        <td>{{ element.description }}</td>
+        <td>{{ element.datecreation|date('Y-m-d H:i:s') }}</td>
+        <td class="text-warning">{{ element.idTypec.nomtypec }}</td>
+        <td class="text-warning">{{ element.idProduit.nomProduit }}</td>
+        <td>
+            <a id="btnU" href="{{ path('conseil_update', {'idc': element.idConseil}) }}" class="btn btn-outline-warning btn-icon-text">Modifier <i class="mdi mdi-file-check btn-icon-append"></i></a>
+        </td>
+        <td>
+            <a href="{{ path('conseil_delete', {'id': element.idConseil}) }}" class="btn btn-outline-danger btn-icon-text">Supprimer <i class="mdi mdi-file-remove btn-icon-append"></i></a>
+        </td>
+    </tr>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+            <div class="row">
+              <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="card-title">Basic form elements</h4>
+                      {{form_start(f)}}
+                      {{form_row(f.nomtypec)}}
+                      {{form_end(f)}}
+                      <a href="{{path('getAll')}}" class="btn btn-dark">Cancel</a>
+                  </div>
+                </div>
+              </div>
+{% endblock %}

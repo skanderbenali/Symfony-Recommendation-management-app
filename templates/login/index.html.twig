@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiggyFood - Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/swiggy-theme.css') }}">
+    <style>
+        :root {
+            --swiggy-navy: #2c3e50;
+            --swiggy-navy-light: #4ca1af;
+            --swiggy-navy-dark: #1a252f;
+            --swiggy-orange: #ff9900;
+            --swiggy-orange-dark: #ff6600;
+        }
+        body {
+            background: linear-gradient(135deg, var(--swiggy-navy), var(--swiggy-navy-light));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px 40px;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .login-container h1 {
+            margin-bottom: 30px;
+            color: var(--swiggy-navy);
+            font-weight: 600;
+        }
+        .login-container h1 span {
+            color: var(--swiggy-orange);
+        }
+        .logo {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+            object-fit: contain;
+        }
+        .btn-login {
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            margin: 10px;
+            width: 80%;
+        }
+        .btn-admin {
+            background-color: var(--swiggy-navy);
+            color: white;
+        }
+        .btn-admin:hover {
+            background-color: var(--swiggy-navy-dark);
+            color: white;
+            transform: translateY(-2px);
+        }
+        .btn-user {
+            background-color: var(--swiggy-orange);
+            color: white;
+        }
+        .btn-user:hover {
+            background-color: var(--swiggy-orange-dark);
+            color: white;
+            transform: translateY(-2px);
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .icon {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="{{ asset('uploads/swiggy_logo.png') }}" alt="Swiggy Logo" class="logo">
+        <h1><span>Swiggy</span>Food</h1>
+        <p class="mb-4 text-muted">Delicious food, delivered to your doorstep</p>
+        
+        <div class="d-flex flex-column align-items-center">
+            <a href="{{ path('getAll') }}" class="btn btn-login btn-admin">
+                <i class="fas fa-user-shield icon"></i> Admin Dashboard
+            </a>
+            
+            <a href="{{ path('getAllFront') }}" class="btn btn-login btn-user">
+                <i class="fas fa-user icon"></i> Customer Portal
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p> 2025 SwiggyFood. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

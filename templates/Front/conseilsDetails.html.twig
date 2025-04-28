@@ -1,0 +1,618 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block body %}       
+<style>
+    .detail-hero {
+        background: linear-gradient(135deg, rgba(13, 110, 253, 0.9) 0%, rgba(247, 139, 35, 0.85) 100%);
+        padding: 80px 0 50px;
+        position: relative;
+        overflow: hidden;
+        color: white;
+    }
+    
+    .detail-hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 50%;
+        height: 100%;
+        background-image: url('{{ asset('uploads/conseil/' ~ c.video)|replace({'.mp4': '.jpg'}) }}');
+        background-size: cover;
+        background-position: center;
+        opacity: 0.2;
+        filter: blur(5px);
+        transform: scale(1.1);
+    }
+    
+    .detail-hero h1 {
+        font-size: 2.8rem;
+        font-weight: 800;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        margin-bottom: 20px;
+    }
+    
+    .detail-hero .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+        margin-bottom: 25px;
+    }
+    
+    .detail-hero .breadcrumb-item a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .detail-hero .breadcrumb-item a:hover {
+        color: white;
+    }
+    
+    .detail-hero .breadcrumb-item.active {
+        color: white;
+        font-weight: 600;
+    }
+    
+    .detail-hero .breadcrumb-item + .breadcrumb-item::before {
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .recommendation-meta {
+        display: inline-flex;
+        align-items: center;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 50px;
+        padding: 8px 16px;
+        margin-right: 10px;
+        margin-bottom: 15px;
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+    }
+    
+    .recommendation-meta:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .recommendation-meta i {
+        margin-right: 8px;
+        font-size: 0.9rem;
+    }
+    
+    .cta-buttons {
+        margin-top: 30px;
+    }
+    
+    .cta-buttons .btn {
+        border-radius: 50px;
+        padding: 10px 25px;
+        margin-right: 10px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-play {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #F78B23;
+        color: white;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-play::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: scale(0);
+        transition: all 0.4s ease;
+    }
+    
+    .btn-play:hover::before {
+        transform: scale(1.5);
+    }
+    
+    .btn-play i {
+        font-size: 1.5rem;
+        position: relative;
+        left: 2px;
+    }
+    
+    .play-text {
+        margin-left: 15px;
+        font-weight: 600;
+        color: white;
+    }
+</style>
+
+<!-- Custom Detail Hero Section -->
+<div class="detail-hero mt-5">
+    <div class="container position-relative">
+        <div class="row">
+            <div class="col-lg-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ path('getAllFront') }}"><i class="fas fa-home"></i> Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('getAllFront', {'category': c.idTypec.idtypec}) }}">{{ c.idTypec.nomtypec }}</a></li>
+                        <li class="breadcrumb-item active">{{ c.nomConseil }}</li>
+                    </ol>
+                </nav>
+                
+                <h1>{{ c.nomConseil }}</h1>
+                
+                <div class="mb-4">
+                    <div class="recommendation-meta">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>{{ c.datecreation|date('M d, Y') }}</span>
+                    </div>
+                    
+                    <div class="recommendation-meta">
+                        <i class="fas fa-folder"></i>
+                        <span>{{ c.idTypec.nomtypec }}</span>
+                    </div>
+                    
+                    <div class="recommendation-meta">
+                        <i class="fas fa-comments"></i>
+                        <span>{{ numberReview }} Reviews</span>
+                    </div>
+                    
+                    <div class="recommendation-meta">
+                        <i class="fas fa-star text-warning"></i>
+                        <span>
+                            {% set totalStars = 5 %}
+                            {% set filledStars = averageRating|round(1) %}
+                            {{ filledStars }} / {{ totalStars }}
+                        </span>
+                    </div>
+                </div>
+                
+                <p class="lead text-white-50">{{ c.description|length > 150 ? c.description|slice(0, 150) ~ '...' : c.description }}</p>
+                
+                <div class="cta-buttons d-flex align-items-center flex-wrap">
+                    <a href="{{ path('getAllFront') }}" class="btn btn-light me-3 mb-2">
+                        <i class="fas fa-arrow-left me-2"></i>All Recommendations
+                    </a>
+                    
+                    <button onclick="playVideo('{{ asset('uploads/conseil/' ~ c.video) }}')" class="btn-play mb-2">
+                        <i class="fas fa-play"></i>
+                    </button>
+                    <span class="play-text mb-2">Watch Video</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div class="container-fluid py-5 mt-3">
+        <div class="container">
+            <div class="row g-4 mb-5">
+                <div class="col-lg-8 col-xl-9">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                <div class="col-lg-6">
+                                    <div class="border rounded shadow-sm">
+                                        <div class="video-thumbnail position-relative" style="width: 100%; height: 320px;">
+                                            <video width="100%" height="100%" class="rounded">
+                                                <source src="{{ asset('uploads/conseil/' ~ c.video) }}" type="video/mp4">
+                                            </video>
+                                            <div class="play-overlay" onclick="playVideo('{{ asset('uploads/conseil/' ~ c.video) }}')">
+                                                <i class="fa fa-play-circle fa-3x text-white"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <h4 class="fw-bold mb-3 text-primary">About this recommendation</h4>
+                                    
+                                    <div class="d-flex mb-3">
+                                        {% set totalStars = 5 %}
+                                        {% set filledStars = averageRating|round(0, 'ceil') %}
+
+                                        {% if filledStars > totalStars %}
+                                            {% set filledStars = totalStars %}
+                                        {% endif %}
+
+                                        {% set emptyStars = totalStars - filledStars %}
+
+                                        <div class="me-2">
+                                            {% for i in range(1, filledStars) %}
+                                                <i class="fa fa-star text-warning"></i>
+                                            {% endfor %}
+
+                                            {% for i in range(1, emptyStars) %}
+                                                <i class="fa fa-star text-muted"></i>   
+                                            {% endfor %}
+                                        </div>
+                                        <span class="text-muted">({{ numberReview }} reviews)</span>
+                                    </div>
+
+                                    <p class="mb-4 text-muted">{{ c.description }}</p>
+                                    
+                                    <div class="d-flex justify-content-between flex-wrap mt-4">
+                                        <a href="{{ path('getAllFront') }}" class="btn btn-outline-primary">
+                                            <i class="fas fa-arrow-left me-2"></i>Back to Recommendations
+                                        </a>
+                                        <button class="btn btn-primary" onclick="document.getElementById('nav-add-review-tab').click()">
+                                            <i class="fas fa-star me-2"></i>Write a Review
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <ul class="nav nav-tabs border-0" id="recommendationTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active px-4 py-3" id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about" type="button" role="tab" aria-controls="nav-about" aria-selected="true">
+                                        <i class="far fa-file-alt me-2"></i>Details
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link px-4 py-3" id="nav-reviews-tab" data-bs-toggle="tab" data-bs-target="#nav-reviews" type="button" role="tab" aria-controls="nav-reviews" aria-selected="false">
+                                        <i class="far fa-comment-dots me-2"></i>Reviews <span class="badge bg-secondary rounded-pill">{{ numberReview }}</span>
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link px-4 py-3" id="nav-add-review-tab" data-bs-toggle="tab" data-bs-target="#nav-add-review" type="button" role="tab" aria-controls="nav-add-review" aria-selected="false">
+                                        <i class="fas fa-pencil-alt me-2"></i>Add Review
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content py-4" id="recommendationTabsContent">
+                                <div class="tab-pane fade show active" id="nav-about" role="tabpanel" aria-labelledby="nav-about-tab">
+                                    <h5 class="text-primary mb-3">Description</h5>
+                                    <p>{{ c.description }}</p>
+                                </div>
+
+                                <div class="tab-pane fade" id="nav-reviews" role="tabpanel" aria-labelledby="nav-reviews-tab">
+                                    <div class="review-list-container">
+                                        {% if reviewsC|length > 0 %}
+                                            {% for review in reviewsC %}
+                                                <div class="card mb-3 border-0 shadow-sm">
+                                                    <div class="card-body">
+                                                        <div class="d-flex">
+                                                            <div class="flex-shrink-0">
+                                                                <img src="{{ asset('Front/assets/img/user.png') }}" class="rounded-circle p-1 border" style="width: 60px; height: 60px;" alt="">
+                                                            </div>
+                                                            <div class="flex-grow-1 ms-3">
+                                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                    <h5 class="mb-0">{{ review.title }}</h5>
+                                                                    <small class="text-muted">{{ review.datecreation|date('M d, Y') }}</small>
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    {% for i in 1..5 %}
+                                                                        {% if i <= review.value %}
+                                                                            <i class="fa fa-star text-warning"></i>
+                                                                        {% else %}
+                                                                            <i class="fa fa-star text-muted"></i>
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                </div>
+                                                                <p class="mb-0">{{ review.comments }}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="text-center py-5">
+                                                <i class="far fa-comment-dots fa-4x text-muted mb-3"></i>
+                                                <h5>No reviews yet</h5>
+                                                <p class="text-muted">Be the first to review this recommendation!</p>
+                                                <button class="btn btn-primary" onclick="document.getElementById('nav-add-review-tab').click()">
+                                                    <i class="fas fa-pencil-alt me-2"></i>Write a Review
+                                                </button>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="nav-add-review" role="tabpanel" aria-labelledby="nav-add-review-tab">
+                                    <div class="row justify-content-center">
+                                        <div class="col-lg-10">
+                                            <h5 class="text-primary mb-4">Share your experience</h5>
+                                            
+                                            {{ form_start(form, {'attr': {'class': 'review-form'}}) }}
+                                                <div class="row g-4">
+                                                    <div class="col-12">
+                                                        <label class="form-label">Your Rating</label>
+                                                        <div class="star-rating mb-3">
+                                                            <i class="fa fa-star star fs-4" data-value="1"></i>
+                                                            <i class="fa fa-star star fs-4" data-value="2"></i>
+                                                            <i class="fa fa-star star fs-4" data-value="3"></i>
+                                                            <i class="fa fa-star star fs-4" data-value="4"></i>
+                                                            <i class="fa fa-star star fs-4" data-value="5"></i>
+                                                        </div>
+                                                        {{ form_widget(form.value, {'attr': {'class': 'rating-input'}}) }}
+                                                    </div>
+                                                    <div class="col-12">
+                                                        {{ form_row(form.title, {
+                                                            'label': 'Review Title',
+                                                            'label_attr': {'class': 'form-label'},
+                                                            'attr': {
+                                                                'class': 'form-control bg-light border-0 px-4',
+                                                                'placeholder': 'How would you summarize your experience?',
+                                                                'style': 'height: 55px;'
+                                                            }
+                                                        }) }}
+                                                    </div>
+                                                    <div class="col-12">
+                                                        {{ form_row(form.comments, {
+                                                            'label': 'Your Review',
+                                                            'label_attr': {'class': 'form-label'},
+                                                            'attr': {
+                                                                'class': 'form-control bg-light border-0 px-4 py-3',
+                                                                'rows': '4',
+                                                                'placeholder': 'Share the details of your experience with this recommendation...'
+                                                            }
+                                                        }) }}
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <button class="btn btn-primary py-3 px-5" type="submit">
+                                                            <i class="fas fa-paper-plane me-2"></i>Submit Review
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            {{ form_end(form) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-xl-3">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0"><i class="fas fa-list-alt me-2"></i>Categories</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="input-group mb-3">
+                                <input type="search" class="form-control" placeholder="Search categories...">
+                                <button class="btn btn-primary" type="button"><i class="fa fa-search"></i></button>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <a href="{{ path('getAllFront') }}" class="text-decoration-none text-dark">All Categories</a>
+                                    <span class="badge bg-primary rounded-pill">{{ conseilsCount }}</span>
+                                </li>
+                                {% for category in categories %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        <a href="{{ path('getAllFront', {'category': category.idtypec}) }}" class="text-decoration-none text-dark">{{ category.nomtypec }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0"><i class="fas fa-award me-2"></i>Featured products</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="d-flex mb-3">
+                                <div class="flex-shrink-0">
+                                    <img src="{{ asset('Front/assets/img/featur-1.jpg')}}" class="img-fluid rounded" style="width: 80px; height: 80px; object-fit: cover;" alt="Image">
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">Big Banana</h6>
+                                    <div class="d-flex mb-2">
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-muted"></i>
+                                    </div>         
+                                    <div class="d-flex">
+                                        <h6 class="text-primary me-2">$2.99</h6>
+                                        <h6 class="text-decoration-line-through text-muted">$4.11</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card border-0 shadow-sm overflow-hidden">
+                        <div class="position-relative">
+                            <img src="{{ asset('Front/assets/img/banner-fruits.jpg')}}" class="card-img-top" alt="">
+                            <div class="position-absolute" style="top: 50%; right: 10px; transform: translateY(-50%);">
+                                <h3 class="text-white fw-bold text-shadow">Fresh <br> Fruits <br> Banner</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Video Modal -->
+<div id="videoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="videoModalLabel">{{ c.nomConseil }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <video id="modalVideoPlayer" class="w-100" controls autoplay>
+                    <source src="" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.querySelector('#{{ form.value.vars.id }}');
+
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const ratingValue = parseInt(star.dataset.value);
+            
+            // Update the value of the hidden input field
+            ratingInput.value = ratingValue;
+
+            // Update star colors based on rating
+            stars.forEach(s => {
+                const value = parseInt(s.dataset.value);
+                s.classList.remove('text-muted', 'text-warning');
+                s.classList.add(value <= ratingValue ? 'text-warning' : 'text-muted');
+            });
+        });
+    });
+    
+    // Function to play video in modal
+    window.playVideo = function(videoUrl) {
+        // Set the video source
+        var videoElement = document.getElementById('modalVideoPlayer');
+        videoElement.querySelector('source').setAttribute('src', videoUrl);
+        videoElement.load();
+        
+        // Open the modal
+        $('#videoModal').modal('show');
+        
+        // Play the video
+        videoElement.play();
+    };
+    
+    // Reset video when modal is closed
+    $('#videoModal').on('hidden.bs.modal', function () {
+        var videoElement = document.getElementById('modalVideoPlayer');
+        videoElement.pause();
+        videoElement.currentTime = 0;
+    });
+});
+</script>
+
+<style>
+    .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .shadowR {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .star-rating {
+        font-size: 24px;
+    }
+
+    .star {
+        cursor: pointer;
+        color: #ccc;
+        transition: color 0.2s;
+        margin-right: 5px;
+    }
+
+    .star.text-warning {
+        color: #FFC107;
+    }
+    
+    .star:hover {
+        transform: scale(1.1);
+    }
+    
+    .review-list-container {
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+    
+    .review-form label {
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    
+    .video-thumbnail {
+        overflow: hidden;
+        border-radius: 8px;
+        position: relative;
+    }
+    
+    .video-thumbnail video {
+        object-fit: cover;
+    }
+    
+    .play-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .play-overlay:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+    
+    .play-overlay i {
+        font-size: 48px;
+        opacity: 0.9;
+        transition: all 0.3s ease;
+    }
+    
+    .play-overlay:hover i {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    
+    .nav-tabs .nav-link {
+        border: none;
+        border-radius: 0;
+        font-weight: 500;
+        color: #6c757d;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #0d6efd;
+        border-bottom: 2px solid #0d6efd;
+        background-color: transparent;
+    }
+    
+    .nav-tabs .nav-link:hover:not(.active) {
+        background-color: rgba(13, 110, 253, 0.05);
+        color: #0d6efd;
+    }
+    
+    .breadcrumb-item a {
+        text-decoration: none;
+    }
+    
+    .breadcrumb-item.active {
+        font-weight: 500;
+    }
+    
+    .list-group-item a:hover {
+        color: #0d6efd !important;
+    }
+</style>
+
+{% endblock %}

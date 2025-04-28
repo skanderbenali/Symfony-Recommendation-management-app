@@ -1,0 +1,332 @@
+{% extends 'baseFront.html.twig' %}
+
+{% block body %}
+
+<style>
+    .testimonial-item {
+        padding: 80px; /* Adjust the padding to increase the size */
+        margin-bottom: 20px; /* Add margin to separate each list item */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adjust the shadow color and intensity as needed */
+        border-radius: 10px;
+    }
+    
+    .recommendations-hero {
+        background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('{{ asset('Front/assets/img/banner-fruits.jpg')}}');
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+        padding: 100px 0 70px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .recommendations-hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(247, 139, 35, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+    }
+    
+    .recommendations-hero h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        margin-bottom: 20px;
+    }
+    
+    .recommendations-hero p {
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin: 0 auto 30px;
+    }
+    
+    .accent-text {
+        color: #F78B23;
+        font-weight: bold;
+    }
+    
+    .animated-badge {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .search-box {
+        position: relative;
+        max-width: 550px;
+        margin: 0 auto;
+    }
+    
+    .search-box input {
+        height: 60px;
+        border-radius: 30px;
+        padding-left: 25px;
+        padding-right: 60px;
+        font-size: 1.1rem;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .search-box button {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        height: 50px;
+        width: 50px;
+        border-radius: 50%;
+        background-color: #F78B23;
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .search-box button:hover {
+        background-color: #0d6efd;
+    }
+</style>
+
+<!-- Custom Hero Section -->
+<div class="recommendations-hero mt-5">
+    <div class="container text-center position-relative">
+        <h1 class="mb-3 animated fadeIn">Culinary <span class="accent-text">Recommendations</span></h1>
+        <p class="mb-4 animated fadeIn">Discover expert food advice, cooking techniques, and recipe insights from our community of culinary enthusiasts.</p>
+        
+        <div class="d-flex justify-content-center mb-4">
+            <span class="badge bg-primary px-3 py-2 mx-2 animated-badge fs-6">
+                <i class="fas fa-utensils me-2"></i>{{ number }} Recommendations
+            </span>
+            <span class="badge bg-light text-dark px-3 py-2 mx-2 fs-6">
+                <i class="fas fa-star text-warning me-2"></i>Highly Rated Content
+            </span>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" class="form-control" placeholder="Search for recipes, techniques, or ingredients...">
+            <button type="button"><i class="fas fa-search"></i></button>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5 mt-5">
+    <div class="row">
+        <!-- Left column for categories -->
+        <div class="col-lg-4 col-xl-3">
+            <div class="row g-4 fruite">
+                <div class="col-lg-12">
+                    <div class="input-group w-100 mx-auto d-flex mb-4">
+                        <input type="search" class="form-control p-3" placeholder="keywords" aria-describedby="search-icon-1">
+                        <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                    </div>
+                    <div class="mb-4">
+                        <h4>Categories</h4>
+                        <ul class="list-unstyled fruite-categorie">
+                            <li>
+                                <div class="d-flex justify-content-between fruite-name">
+                                    <a href="{{ path('getAllFront') }}">Toutes les Catégories</a>
+                                    <span>({{ number }})</span>
+                                </div>
+                            </li>
+                            {% for category in categories %}
+                                <li>
+                                    <div class="d-flex justify-content-between fruite-name">
+                                        <a href="{{ path('getAllFront', {'category': category.idtypec}) }}">{{ category.nomtypec }}</a>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <h4 class="mb-4">Featured products</h4>
+                    
+                    <div class="d-flex align-items-center justify-content-start">
+                        <div class="rounded" style="width: 100px; height: 100px;">
+                            <img src="{{ asset('Front/assets/img/featur-1.jpg')}}" class="img-fluid rounded" alt="Image">
+                        </div>
+                        <div>
+                            <h6 class="mb-2">Big Banana</h6>
+                            <div class="d-flex mb-2">
+                                <i class="fa fa-star text-secondary"></i>
+                                <i class="fa fa-star text-secondary"></i>
+                                <i class="fa fa-star text-secondary"></i>
+                                <i class="fa fa-star text-secondary"></i>
+                                <i class="fa fa-star"></i>
+                            </div>         
+                            <div class="d-flex mb-2">
+                                <h5 class="fw-bold me-2">2.99 $</h5>
+                                <h5 class="text-danger text-decoration-line-through">4.11 $</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="position-relative">
+                        <img src="{{ asset('Front/assets/img/banner-fruits.jpg')}}" class="img-fluid w-100 rounded" alt="">
+                        <div class="position-absolute" style="top: 50%; right: 10px; transform: translateY(-50%);">
+                            <h3 class="text-secondary fw-bold">Fresh <br> Fruits <br> Banner</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right column for testimonial list -->
+        <div class="col-lg-9">
+            <!-- Adjust the column width (col-lg-9) for the main content -->
+            <div class="testimonial-list-container">
+                <ul class="testimonial-list">
+                    <!-- Loop through your elements -->
+                    {% for element in c %}
+                        <li>
+                            <div class="testimonial-item img-border-radius bg-light rounded p-5">
+                                <div class="position-relative">
+                                    <i class="fa fa-quote-right fa-2x text-secondary position-absolute" style="bottom: 30px; right: 0;"></i>
+                                    <div class="mb-4 pb-4 border-bottom border-secondary">
+                                        <p class="mb-0">{{ element.description }}</p>
+                                    </div>
+                                    <div class="d-flex align-items-center flex-nowrap">
+                                        <div class="bg-primary rounded">
+                                            <div class="video-thumbnail position-relative" style="width: 400px; height: 280px;">
+                                                <video width="100%" height="100%" class="rounded">
+                                                    <source src="{{ asset('uploads/conseil/' ~ element.video) }}" type="video/mp4">
+                                                </video>
+                                                <div class="play-overlay" onclick="playVideo('{{ asset('uploads/conseil/' ~ element.video) }}')">
+                                                    <i class="fa fa-play-circle fa-3x text-white"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="ms-4 d-block">
+                                            <h2 class="text-dark">{{ element.nomConseil }}</h2>
+                                            <h5 class="m-0 pb-3">Type: {{ element.idTypec.nomtypec }}</h5>
+                                            <p class="m-0 pb-3">Created at: {{ element.datecreation|date('Y-m-d') }}</p>
+                                            <div class="d-flex pe-2">
+                                                <i class="fas fa-star text-primary"></i>
+                                                <i class="fas fa-star text-primary"></i>
+                                                <i class="fas fa-star text-primary"></i>
+                                                <i class="fas fa-star text-primary"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>         
+                                            <br>
+                                            <a href="{{ path('getOne', {'idc': element.idConseil}) }}" class="btn btn-primary">Consulter</a>
+                                            <br>
+                                            <div class="button-container position-absolute bottom-0 end-0 mb-3 me-5">
+                                                <a href="https://www.facebook.com/" class="btn btn-link" target="_blank"><i class="fab fa-facebook-square fa-lg"></i></a>
+                                                <a href="https://www.instagram.com/" class="btn btn-link" target="_blank"><i class="fab fa-instagram fa-lg"></i></a>
+                                                <a href="https://twitter.com/" class="btn btn-link" target="_blank"><i class="fab fa-twitter fa-lg"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="col-12">
+        <div class="pagination d-flex justify-content-center mt-5">
+            {{ knp_pagination_render(c) }}
+        </div>
+    </div>
+</div>
+
+<!-- Video Modal -->
+<div id="videoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="videoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="videoModalLabel">Video Preview</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <video id="modalVideoPlayer" class="w-100" controls autoplay>
+                    <source src="" type="video/mp4">
+                </video>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .video-thumbnail {
+        overflow: hidden;
+        border-radius: 8px;
+        position: relative;
+    }
+    
+    .video-thumbnail video {
+        object-fit: cover;
+    }
+    
+    .play-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .play-overlay:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+    
+    .play-overlay i {
+        font-size: 48px;
+        opacity: 0.9;
+        transition: all 0.3s ease;
+    }
+    
+    .play-overlay:hover i {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    function playVideo(videoUrl) {
+        // Set the video source
+        var videoElement = document.getElementById('modalVideoPlayer');
+        videoElement.querySelector('source').setAttribute('src', videoUrl);
+        videoElement.load();
+        
+        // Open the modal
+        $('#videoModal').modal('show');
+        
+        // Play the video
+        videoElement.play();
+    }
+    
+    // Reset video when modal is closed
+    $('#videoModal').on('hidden.bs.modal', function () {
+        var videoElement = document.getElementById('modalVideoPlayer');
+        videoElement.pause();
+        videoElement.currentTime = 0;
+    });
+</script>
+{% endblock %}

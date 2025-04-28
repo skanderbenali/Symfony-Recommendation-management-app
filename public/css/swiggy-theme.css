@@ -1,0 +1,245 @@
+:root {
+    --swiggy-orange: #F78B23;
+    --swiggy-orange-light: #ffac5a;
+    --swiggy-orange-dark: #d87111;
+    --swiggy-navy: #192F5D;
+    --swiggy-navy-light: #2a477d;
+    --swiggy-navy-dark: #0e1b36;
+    --swiggy-gray: #f8f9fa;
+    --swiggy-text: #343a40;
+    --light-bg: #ffffff;
+    --light-card: #f8f9fa;
+    --light-border: #e9ecef;
+    --light-text: #212529;
+}
+
+/* General overrides */
+.bg-primary {
+    background-color: var(--swiggy-navy) !important;
+}
+
+.text-primary {
+    color: var(--swiggy-orange) !important;
+}
+
+.bg-secondary {
+    background-color: var(--swiggy-orange) !important;
+}
+
+.text-secondary {
+    color: var(--swiggy-navy) !important;
+}
+
+.btn-primary {
+    background-color: var(--swiggy-orange) !important;
+    border-color: var(--swiggy-orange) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--swiggy-orange-dark) !important;
+    border-color: var(--swiggy-orange-dark) !important;
+}
+
+.btn-secondary {
+    background-color: var(--swiggy-navy) !important;
+    border-color: var(--swiggy-navy) !important;
+}
+
+.btn-secondary:hover {
+    background-color: var(--swiggy-navy-light) !important;
+    border-color: var(--swiggy-navy-light) !important;
+}
+
+/* Dashboard specific - Light Mode */
+body, .content-wrapper, .container-fluid {
+    background-color: var(--light-bg) !important;
+    color: var(--light-text) !important;
+}
+
+.card {
+    background-color: var(--light-card) !important;
+    border: 1px solid var(--light-border) !important;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.sidebar {
+    background-color: white !important;
+    border-right: 1px solid var(--light-border);
+}
+
+.sidebar .nav .nav-item .nav-link {
+    color: var(--swiggy-text) !important;
+}
+
+.sidebar .nav .nav-item.active {
+    background-color: #f1f1f1 !important;
+}
+
+.sidebar .nav .nav-item .nav-link:hover {
+    background-color: #f1f1f1 !important;
+}
+
+.sidebar .nav .nav-item.active > .nav-link i, 
+.sidebar .nav .nav-item.active > .nav-link .menu-title, 
+.sidebar .nav .nav-item.active > .nav-link .menu-arrow {
+    color: var(--swiggy-orange) !important;
+}
+
+.sidebar-brand-wrapper {
+    background-color: var(--swiggy-navy) !important;
+}
+
+.navbar .navbar-menu-wrapper {
+    background: var(--swiggy-navy) !important;
+    color: white !important;
+}
+
+.navbar .navbar-brand-wrapper {
+    background-color: var(--swiggy-navy) !important;
+}
+
+.card .card-title {
+    color: var(--swiggy-navy) !important;
+}
+
+.card-header {
+    background-color: var(--swiggy-navy-light) !important;
+    color: white !important;
+}
+
+/* Table styling - Light Mode */
+.table {
+    color: var(--light-text) !important;
+    background-color: white !important;
+}
+
+.table th {
+    background-color: #f8f9fa !important;
+    color: var(--swiggy-navy) !important;
+    border-bottom: 2px solid var(--swiggy-orange) !important;
+}
+
+.table td {
+    border-color: #e9ecef !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(247, 139, 35, 0.05) !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Form elements - Light Mode */
+.form-control {
+    background-color: white !important;
+    border-color: #ced4da !important;
+    color: #495057 !important;
+}
+
+.form-control:focus {
+    border-color: var(--swiggy-orange) !important;
+    box-shadow: 0 0 0 0.2rem rgba(247, 139, 35, 0.25) !important;
+}
+
+/* Light mode overrides for other components */
+.dropdown-menu {
+    background-color: white !important;
+    color: var(--light-text) !important;
+    border: 1px solid rgba(0,0,0,.15) !important;
+}
+
+.dropdown-item {
+    color: var(--light-text) !important;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+    background-color: #f8f9fa !important;
+    color: var(--swiggy-orange) !important;
+}
+
+/* Modal - Light Mode */
+.modal-content {
+    background-color: white !important;
+}
+
+.modal-header {
+    background-color: var(--swiggy-navy) !important;
+    color: white !important;
+}
+
+/* Font colors for better visibility in light mode */
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.text-info {
+    color: #17a2b8 !important;
+}
+
+/* Footer - Light Mode */
+footer {
+    background-color: var(--light-bg) !important;
+    border-top: 1px solid var(--light-border) !important;
+    color: var(--light-text) !important;
+}
+
+/* Icon colors */
+.mdi.text-success {
+    color: var(--swiggy-orange) !important;
+}
+
+/* Pagination - Light Mode */
+.pagination .page-item.active .page-link {
+    background-color: var(--swiggy-orange) !important;
+    border-color: var(--swiggy-orange) !important;
+}
+
+.pagination .page-link {
+    color: var(--swiggy-navy) !important;
+    background-color: white !important;
+}
+
+.pagination .page-link:hover {
+    color: var(--swiggy-orange) !important;
+    background-color: #e9ecef !important;
+}
+
+/* Nav tabs - Light Mode */
+.nav-tabs .nav-link.active {
+    color: var(--swiggy-orange) !important;
+    background-color: white !important;
+    border-color: #dee2e6 #dee2e6 white !important;
+}
+
+.nav-tabs .nav-link {
+    color: var(--swiggy-navy) !important;
+}
+
+/* Menu icons */
+.menu-icon {
+    color: var(--swiggy-navy) !important;
+}
+
+/* Specific sidebar logo section with navy blue background */
+.sidebar-brand-wrapper {
+    background-color: var(--swiggy-navy) !important;
+}
+
+/* Main Content Light Mode */
+.page-header {
+    border-bottom: 1px solid #e9ecef !important;
+}
+
+.count-indicator .count {
+    border: 2px solid white !important;
+}

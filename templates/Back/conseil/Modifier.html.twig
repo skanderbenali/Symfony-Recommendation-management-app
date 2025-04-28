@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+
+            <div class="row">
+
+              <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="card-title">Basic form elements</h4>
+                      {{ form_start(fc) }}
+    <div class="form-group{% if fc.nomConseil.vars.errors|length > 0 %} has-error{% endif %}">
+        {{ form_label(fc.nomConseil) }}
+        {{ form_widget(fc.nomConseil, {'attr': {'class': 'form-control'}}) }}
+        {% for error in fc.nomConseil.vars.errors %}
+            <span class="text-danger">{{ error.message }}</span>
+        {% endfor %}
+    </div>
+
+    <div class="form-group{% if fc.video.vars.errors|length > 0 %} has-error{% endif %}">
+        {{ form_label(fc.video) }}
+        {{ form_widget(fc.video, {'attr': {'class': 'form-control-file'}}) }}
+        {% for error in fc.video.vars.errors %}
+            <span class="text-danger">{{ error.message }}</span>
+        {% endfor %}
+    </div>
+
+    <div class="form-group{% if fc.description.vars.errors|length > 0 %} has-error{% endif %}">
+        {{ form_label(fc.description) }}
+        {{ form_widget(fc.description, {'attr': {'class': 'form-control'}}) }}
+        {% for error in fc.description.vars.errors %}
+            <span class="text-danger">{{ error.message }}</span>
+        {% endfor %}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(fc.idTypec) }}
+        {{ form_widget(fc.idTypec, {'attr': {'class': 'form-control', 'style': 'width: 450px;'}}) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(fc.idProduit) }}
+        {{ form_widget(fc.idProduit, {'attr': {'class': 'form-control', 'style': 'width: 450px;'}}) }}
+    </div>
+
+    {{ form_end(fc) }}
+                      <a href="{{path('getAll')}}" class="btn btn-dark">Cancel</a>
+                  </div>
+                </div>
+              </div>
+
+
+
+{% endblock %}

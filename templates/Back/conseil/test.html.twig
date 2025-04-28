@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="page-header">
+        <h3 class="page-title">Test Page</h3>
+    </div>
+
+    <div class="row">
+        {% if c is defined %}
+            <p>Variable c is defined with {{ c|length }} items</p>
+        {% else %}
+            <p>Variable c is NOT defined</p>
+        {% endif %}
+        
+        {% if fc is defined %}
+            <p>Variable fc is defined</p>
+        {% else %}
+            <p>Variable fc is NOT defined</p>
+        {% endif %}
+
+        {% if number is defined %}
+            <p>Variable number is defined: {{ number }}</p>
+        {% else %}
+            <p>Variable number is NOT defined</p>
+        {% endif %}
+
+        {% if conseilCountsByType is defined %}
+            <p>Variable conseilCountsByType is defined with {{ conseilCountsByType|length }} items</p>
+        {% else %}
+            <p>Variable conseilCountsByType is NOT defined</p>
+        {% endif %}
+    </div>
+{% endblock %}

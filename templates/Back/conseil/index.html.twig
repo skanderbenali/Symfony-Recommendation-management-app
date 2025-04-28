@@ -1,0 +1,40 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+
+<center><h1>Liste des Conseils</h1></center>
+<br>
+<br>
+<a href="{{path('conseil_add')}}" class="btn btn-primary">Ajouter<a/>
+<table class="table">
+<thead>
+<tr>
+    <td>Id</td>
+    <td>Nom Conseil</td>
+    <td>Video</td>
+    <td>Description</td>
+    <td>Date</td>
+    <td>Categorie</td>
+    <td>Produit</td>
+    <td>Modifier</td>
+    <td>Supprimer</td>
+    
+</tr>
+</thead>
+{%for element in c %}
+<tr>
+    <td>{{element.idConseil}}</td>
+    <td>{{element.nomConseil|upper}}</td>
+    <td>{{element.video}}</td>
+    <td>{{element.description}}</td>
+    <td>{{element.datecreation|date('Y-m-d H:i:s')}}</td>
+    <td>{{element.idTypec.nomtypec}}</td>
+    <td>{{element.idProduit.nomProduit}}</td>
+    <td><a href="{{path('conseil_update',{'id':element.idConseil})}}" class="btn btn-success">Modifier<a/></td>
+    <td><a href="{{path('conseil_delete',{'id':element.idConseil})}}" class="btn btn-danger">Supprimer<a/></td>
+    
+</tr>
+{%endfor%}
+
+
+
+
